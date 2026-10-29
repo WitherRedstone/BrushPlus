@@ -12,7 +12,8 @@ public class BPClientConfig {
 
         builder.comment("渲染设置").push("Render Config");
         RENDER_PROGRESS_ENABLED = builder
-                .comment("是否在方块上放渲染进度")
+                .comment("是否在方块上方渲染进度")
+                .comment("Render progress above the block?")
                 .define("renderProgressEnabled", true);
         builder.pop();
 
