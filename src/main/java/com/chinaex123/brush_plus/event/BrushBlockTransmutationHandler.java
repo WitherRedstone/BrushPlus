@@ -2,6 +2,7 @@ package com.chinaex123.brush_plus.event;
 
 import com.chinaex123.brush_plus.crafting.recipe.BlockTransmutationRecipe;
 import com.chinaex123.brush_plus.init.BPRecipes;
+import com.chinaex123.brush_plus.network.BrushProgressS2CPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
@@ -9,10 +10,10 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BrushItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -21,6 +22,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -34,9 +36,8 @@ public class BrushBlockTransmutationHandler {
     private static final Map<String, Long> LAST_TOUCHED = new HashMap<>();
     private static final long PROGRESS_TIMEOUT_TICKS = 200;
 
-    public static void onBrushTick(Player player, ItemStack heldItem) {
+    public static void onBrushTick(ServerPlayer player, ItemStack heldItem) {
         Level level = player.level();
-        if (level.isClientSide) return;
         if (!(heldItem.getItem() instanceof BrushItem)) return;
 
         HitResult hit = player.pick(5.0D, 0.0F, false);
@@ -68,7 +69,14 @@ public class BrushBlockTransmutationHandler {
                 .filter(r -> r.matches(input, level))
                 .findFirst();
 
-        if (matchedRecipe.isEmpty()) return;
+        if (matchedRecipe.isEmpty()) {
+            if (PROGRESS_MAP.containsKey(progressKey)) {
+                PROGRESS_MAP.remove(progressKey);
+                LAST_TOUCHED.remove(progressKey);
+                PacketDistributor.sendToPlayer(player, new BrushProgressS2CPacket(pos, 0, 0));
+            }
+            return;
+        }
 
         BlockTransmutationRecipe recipe = matchedRecipe.get();
         long gameTime = level.getGameTime();
@@ -81,14 +89,18 @@ public class BrushBlockTransmutationHandler {
         if (lastTime != null && (gameTime - lastTime) > PROGRESS_TIMEOUT_TICKS) {
             PROGRESS_MAP.remove(progressKey);
             LAST_TOUCHED.remove(progressKey);
+            PacketDistributor.sendToPlayer(player, new BrushProgressS2CPacket(pos, 0, 0));
         }
 
         int currentProgress = PROGRESS_MAP.getOrDefault(progressKey, 0) + 1;
         LAST_TOUCHED.put(progressKey, gameTime);
 
+        PacketDistributor.sendToPlayer(player, new BrushProgressS2CPacket(pos, currentProgress, recipe.totalTicks()));
+
         if (currentProgress >= recipe.totalTicks()) {
             PROGRESS_MAP.remove(progressKey);
             LAST_TOUCHED.remove(progressKey);
+            PacketDistributor.sendToPlayer(player, new BrushProgressS2CPacket(pos, 0, 0));
 
             ResourceLocation resultBlockId = recipe.rollResultBlock(level.getRandom());
             if (resultBlockId != null) {

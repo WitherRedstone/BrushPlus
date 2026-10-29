@@ -1,8 +1,8 @@
 package com.chinaex123.brush_plus.mixin;
 
 import com.chinaex123.brush_plus.event.BrushBlockTransmutationHandler;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BrushItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -17,7 +17,7 @@ public class BrushItemMixin {
     @Inject(method = "onUseTick", at = @At("HEAD"))
     private void brushPlus$onUseTick(Level level, LivingEntity entity, ItemStack stack, int remainingUseDuration, CallbackInfo ci) {
         if (level.isClientSide) return;
-        if (!(entity instanceof Player player)) return;
+        if (!(entity instanceof ServerPlayer player)) return;
 
         BrushBlockTransmutationHandler.onBrushTick(player, stack);
     }

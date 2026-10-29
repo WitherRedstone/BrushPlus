@@ -91,7 +91,7 @@ public class ModRecipesProvider extends RecipeProvider implements IConditionBuil
         BlockTransmutationRecipeBuilder.builder()
                 .setIngredient(Blocks.COARSE_DIRT)
                 .addResultBlock(Blocks.DIRT)
-                .setTotalTicks(80)
+                .setTotalTicks(40)
                 .save(output, "coarse_dirt_to_dirt");
         // 雪 → 雪球
         BlockTransmutationRecipeBuilder.builder()
