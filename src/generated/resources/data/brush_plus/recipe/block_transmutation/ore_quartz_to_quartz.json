@@ -1,0 +1,35 @@
+{
+  "type": "brush_plus:block_transmutation",
+  "drops": [
+    {
+      "item": {
+        "count": 2,
+        "id": "minecraft:quartz"
+      }
+    },
+    {
+      "chance": 0.5,
+      "item": {
+        "count": 1,
+        "id": "minecraft:quartz"
+      }
+    },
+    {
+      "chance": 0.2,
+      "item": {
+        "count": 1,
+        "id": "minecraft:quartz"
+      }
+    }
+  ],
+  "ingredient": {
+    "tag": "c:ores/quartz"
+  },
+  "result_blocks": [
+    {
+      "block": "minecraft:netherrack",
+      "chance": 0.25
+    }
+  ],
+  "total_ticks": 40
+}

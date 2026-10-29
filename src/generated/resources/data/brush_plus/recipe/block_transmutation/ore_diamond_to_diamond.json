@@ -1,0 +1,35 @@
+{
+  "type": "brush_plus:block_transmutation",
+  "drops": [
+    {
+      "item": {
+        "count": 1,
+        "id": "minecraft:diamond"
+      }
+    },
+    {
+      "chance": 0.5,
+      "item": {
+        "count": 1,
+        "id": "minecraft:diamond"
+      }
+    },
+    {
+      "chance": 0.05,
+      "item": {
+        "count": 1,
+        "id": "minecraft:diamond"
+      }
+    }
+  ],
+  "ingredient": {
+    "tag": "c:ores/diamond"
+  },
+  "result_blocks": [
+    {
+      "block": "minecraft:cobblestone",
+      "chance": 0.5
+    }
+  ],
+  "total_ticks": 40
+}

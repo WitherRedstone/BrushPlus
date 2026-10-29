@@ -1,0 +1,13 @@
+{
+  "itemGroup.brush_plus": "刷子增强",
+
+  "item.brush_plus.iron_brush": "铁刷子",
+  "item.brush_plus.gold_brush": "金刷子",
+  "item.brush_plus.diamond_brush": "钻石刷子",
+  "item.brush_plus.netherite_brush": "下界合金刷子",
+
+  "jei.brush_plus.block_transmutation.title": "刷子方块转化",
+  "jei.brush_plus.block_transmutation.time": "刷时长: %.1f 秒",
+  "jei.brush_plus.block_transmutation.result_chance": "转化概率: %s",
+  "jei.brush_plus.block_transmutation.drop_chance": "掉落概率: %s"
+}

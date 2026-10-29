@@ -1,0 +1,35 @@
+{
+  "type": "brush_plus:block_transmutation",
+  "drops": [
+    {
+      "item": {
+        "count": 4,
+        "id": "minecraft:lapis_lazuli"
+      }
+    },
+    {
+      "chance": 0.5,
+      "item": {
+        "count": 2,
+        "id": "minecraft:lapis_lazuli"
+      }
+    },
+    {
+      "chance": 0.2,
+      "item": {
+        "count": 2,
+        "id": "minecraft:lapis_lazuli"
+      }
+    }
+  ],
+  "ingredient": {
+    "tag": "c:ores/lapis"
+  },
+  "result_blocks": [
+    {
+      "block": "minecraft:cobblestone",
+      "chance": 0.25
+    }
+  ],
+  "total_ticks": 40
+}

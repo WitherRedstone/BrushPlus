@@ -1,0 +1,19 @@
+{
+  "type": "brush_plus:block_transmutation",
+  "drops": [
+    {
+      "item": {
+        "count": 1,
+        "id": "minecraft:vine"
+      }
+    }
+  ],
+  "ingredient": {
+    "tag": "c:cobblestones/mossy"
+  },
+  "result_blocks": [
+    {
+      "block": "minecraft:cobblestone"
+    }
+  ]
+}

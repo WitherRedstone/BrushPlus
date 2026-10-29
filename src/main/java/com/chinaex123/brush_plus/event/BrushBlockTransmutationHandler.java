@@ -1,0 +1,144 @@
+package com.chinaex123.brush_plus.event;
+
+import com.chinaex123.brush_plus.crafting.recipe.BlockTransmutationRecipe;
+import com.chinaex123.brush_plus.init.BPRecipes;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BrushItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+public class BrushBlockTransmutationHandler {
+
+    private static final Map<String, Integer> PROGRESS_MAP = new HashMap<>();
+    private static final Map<String, Long> LAST_TOUCHED = new HashMap<>();
+    private static final long PROGRESS_TIMEOUT_TICKS = 200;
+
+    public static void onBrushTick(Player player, ItemStack heldItem) {
+        Level level = player.level();
+        if (level.isClientSide) return;
+        if (!(heldItem.getItem() instanceof BrushItem)) return;
+
+        HitResult hit = player.pick(5.0D, 0.0F, false);
+        if (!(hit instanceof BlockHitResult blockHit)) return;
+        if (blockHit.getType() != HitResult.Type.BLOCK) return;
+
+        BlockPos pos = blockHit.getBlockPos();
+        BlockState state = level.getBlockState(pos);
+
+        String progressKey = player.getStringUUID() + ":" + pos.asLong();
+
+        BlockTransmutationRecipe.Input input = new BlockTransmutationRecipe.Input() {
+            @Override
+            public @NotNull ItemStack getBlockItem() {
+                return state.getBlock().asItem().getDefaultInstance();
+            }
+
+            @Override
+            public @NotNull ItemStack getBrushItem() {
+                return heldItem;
+            }
+        };
+
+        List<RecipeHolder<BlockTransmutationRecipe>> recipes =
+                level.getRecipeManager().getAllRecipesFor(BPRecipes.BLOCK_TRANSMUTATION_RECIPE);
+
+        Optional<BlockTransmutationRecipe> matchedRecipe = recipes.stream()
+                .map(RecipeHolder::value)
+                .filter(r -> r.matches(input, level))
+                .findFirst();
+
+        if (matchedRecipe.isEmpty()) return;
+
+        BlockTransmutationRecipe recipe = matchedRecipe.get();
+        long gameTime = level.getGameTime();
+
+        if (gameTime % 4 == 0) {
+            spawnBrushParticles(level, pos, state);
+        }
+
+        Long lastTime = LAST_TOUCHED.get(progressKey);
+        if (lastTime != null && (gameTime - lastTime) > PROGRESS_TIMEOUT_TICKS) {
+            PROGRESS_MAP.remove(progressKey);
+            LAST_TOUCHED.remove(progressKey);
+        }
+
+        int currentProgress = PROGRESS_MAP.getOrDefault(progressKey, 0) + 1;
+        LAST_TOUCHED.put(progressKey, gameTime);
+
+        if (currentProgress >= recipe.totalTicks()) {
+            PROGRESS_MAP.remove(progressKey);
+            LAST_TOUCHED.remove(progressKey);
+
+            ResourceLocation resultBlockId = recipe.rollResultBlock(level.getRandom());
+            if (resultBlockId != null) {
+                Block block = BuiltInRegistries.BLOCK.get(resultBlockId);
+                level.setBlock(pos, block.defaultBlockState(), Block.UPDATE_ALL);
+            }
+
+            for (BlockTransmutationRecipe.DropEntry entry : recipe.validDrops()) {
+                if (level.getRandom().nextFloat() < entry.chance()) {
+                    ItemStack dropStack = entry.item().copy();
+                    ItemEntity itemEntity = new ItemEntity(
+                            level,
+                            pos.getX() + 0.5,
+                            pos.getY() + 1.0,
+                            pos.getZ() + 0.5,
+                            dropStack
+                    );
+                    itemEntity.setDeltaMovement(
+                            (level.getRandom().nextDouble() - 0.5) * 0.15,
+                            0.35,
+                            (level.getRandom().nextDouble() - 0.5) * 0.15
+                    );
+                    itemEntity.setPickUpDelay(10);
+                    level.addFreshEntity(itemEntity);
+                }
+            }
+
+            InteractionHand hand = player.getUsedItemHand();
+            EquipmentSlot slot = hand == InteractionHand.MAIN_HAND
+                    ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+            heldItem.hurtAndBreak(1, player, slot);
+        } else {
+            PROGRESS_MAP.put(progressKey, currentProgress);
+        }
+    }
+
+    private static void spawnBrushParticles(Level level, BlockPos pos, BlockState state) {
+        ParticleOptions options = new BlockParticleOption(ParticleTypes.BLOCK, state);
+        ServerLevel serverLevel = (ServerLevel) level;
+
+        double x = pos.getX() + 0.5;
+        double y = pos.getY() + 0.5;
+        double z = pos.getZ() + 0.5;
+        for (int i = 0; i < 8; i++) {
+            double ox = (level.getRandom().nextDouble() - 0.5) * 0.5;
+            double oy = level.getRandom().nextDouble() * 0.5;
+            double oz = (level.getRandom().nextDouble() - 0.5) * 0.5;
+            serverLevel.sendParticles(options,
+                    x + ox, y + oy, z + oz,
+                    1, 0, 0, 0, 0.01);
+        }
+    }
+}

@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "com.chinaex123.brush_plus.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "BrushItemMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

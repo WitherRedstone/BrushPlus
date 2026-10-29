@@ -1,0 +1,13 @@
+{
+  "itemGroup.brush_plus": "Brush Plus",
+
+  "item.brush_plus.iron_brush": "Iron Brush",
+  "item.brush_plus.gold_brush": "Gold Brush",
+  "item.brush_plus.diamond_brush": "Diamond Brush",
+  "item.brush_plus.netherite_brush": "Netherite Brush",
+
+  "jei.brush_plus.block_transmutation.title": "Brush Block Transmutation",
+  "jei.brush_plus.block_transmutation.time": "Brush time: %.1f sec",
+  "jei.brush_plus.block_transmutation.result_chance": "Conversion chance: %s",
+  "jei.brush_plus.block_transmutation.drop_chance": "Drop chance: %s"
+}

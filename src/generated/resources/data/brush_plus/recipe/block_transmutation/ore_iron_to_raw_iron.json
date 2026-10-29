@@ -1,0 +1,35 @@
+{
+  "type": "brush_plus:block_transmutation",
+  "drops": [
+    {
+      "item": {
+        "count": 1,
+        "id": "minecraft:raw_iron"
+      }
+    },
+    {
+      "chance": 0.5,
+      "item": {
+        "count": 1,
+        "id": "minecraft:raw_iron"
+      }
+    },
+    {
+      "chance": 0.05,
+      "item": {
+        "count": 1,
+        "id": "minecraft:raw_iron"
+      }
+    }
+  ],
+  "ingredient": {
+    "tag": "c:ores/iron"
+  },
+  "result_blocks": [
+    {
+      "block": "minecraft:cobblestone",
+      "chance": 0.25
+    }
+  ],
+  "total_ticks": 40
+}

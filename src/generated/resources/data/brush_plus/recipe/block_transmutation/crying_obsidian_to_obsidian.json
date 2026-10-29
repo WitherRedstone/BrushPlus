@@ -1,0 +1,12 @@
+{
+  "type": "brush_plus:block_transmutation",
+  "ingredient": {
+    "tag": "c:obsidians/crying"
+  },
+  "result_blocks": [
+    {
+      "block": "minecraft:obsidian"
+    }
+  ],
+  "total_ticks": 100
+}

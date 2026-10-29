@@ -1,0 +1,11 @@
+{
+  "type": "brush_plus:block_transmutation",
+  "ingredient": {
+    "item": "minecraft:coarse_dirt"
+  },
+  "result_blocks": [
+    {
+      "block": "minecraft:dirt"
+    }
+  ]
+}
