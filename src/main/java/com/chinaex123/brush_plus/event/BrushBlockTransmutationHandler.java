@@ -33,8 +33,19 @@ import java.util.Optional;
 public class BrushBlockTransmutationHandler {
 
     private static final Map<String, Integer> PROGRESS_MAP = new HashMap<>();
-    private static final Map<String, Long> LAST_TOUCHED = new HashMap<>();
-    private static final long PROGRESS_TIMEOUT_TICKS = 200;
+
+    public static void clearAllProgress(ServerPlayer player) {
+        String uuid = player.getStringUUID();
+        var keys = PROGRESS_MAP.keySet().stream()
+                .filter(k -> k.startsWith(uuid + ":"))
+                .toList();
+        for (String key : keys) {
+            PROGRESS_MAP.remove(key);
+            long posAsLong = Long.parseLong(key.substring(uuid.length() + 1));
+            BlockPos pos = BlockPos.of(posAsLong);
+            PacketDistributor.sendToPlayer(player, new BrushProgressS2CPacket(pos, 0, 0));
+        }
+    }
 
     public static void onBrushTick(ServerPlayer player, ItemStack heldItem) {
         Level level = player.level();
@@ -72,7 +83,6 @@ public class BrushBlockTransmutationHandler {
         if (matchedRecipe.isEmpty()) {
             if (PROGRESS_MAP.containsKey(progressKey)) {
                 PROGRESS_MAP.remove(progressKey);
-                LAST_TOUCHED.remove(progressKey);
                 PacketDistributor.sendToPlayer(player, new BrushProgressS2CPacket(pos, 0, 0));
             }
             return;
@@ -85,21 +95,12 @@ public class BrushBlockTransmutationHandler {
             spawnBrushParticles(level, pos, state);
         }
 
-        Long lastTime = LAST_TOUCHED.get(progressKey);
-        if (lastTime != null && (gameTime - lastTime) > PROGRESS_TIMEOUT_TICKS) {
-            PROGRESS_MAP.remove(progressKey);
-            LAST_TOUCHED.remove(progressKey);
-            PacketDistributor.sendToPlayer(player, new BrushProgressS2CPacket(pos, 0, 0));
-        }
-
         int currentProgress = PROGRESS_MAP.getOrDefault(progressKey, 0) + 1;
-        LAST_TOUCHED.put(progressKey, gameTime);
 
         PacketDistributor.sendToPlayer(player, new BrushProgressS2CPacket(pos, currentProgress, recipe.totalTicks()));
 
         if (currentProgress >= recipe.totalTicks()) {
             PROGRESS_MAP.remove(progressKey);
-            LAST_TOUCHED.remove(progressKey);
             PacketDistributor.sendToPlayer(player, new BrushProgressS2CPacket(pos, 0, 0));
 
             ResourceLocation resultBlockId = recipe.rollResultBlock(level.getRandom());
