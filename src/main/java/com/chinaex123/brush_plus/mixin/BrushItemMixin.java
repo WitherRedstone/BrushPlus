@@ -1,6 +1,7 @@
 package com.chinaex123.brush_plus.mixin;
 
 import com.chinaex123.brush_plus.event.BrushBlockTransmutationHandler;
+import com.chinaex123.brush_plus.event.BrushEntityHarvestingHandler;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.BrushItem;
@@ -20,5 +21,6 @@ public class BrushItemMixin {
         if (!(entity instanceof ServerPlayer player)) return;
 
         BrushBlockTransmutationHandler.onBrushTick(player, stack);
+        BrushEntityHarvestingHandler.onBrushTick(player, stack);
     }
 }

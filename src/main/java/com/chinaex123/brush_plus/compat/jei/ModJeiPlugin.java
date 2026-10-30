@@ -2,6 +2,7 @@ package com.chinaex123.brush_plus.compat.jei;
 
 import com.chinaex123.brush_plus.BrushPlus;
 import com.chinaex123.brush_plus.compat.jei.category.BlockTransmutationRecipeCategory;
+import com.chinaex123.brush_plus.compat.jei.category.EntityHarvestingRecipeCategory;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
@@ -20,7 +21,8 @@ public class ModJeiPlugin implements IModPlugin {
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
         registration.addRecipeCategories(
-                new BlockTransmutationRecipeCategory(registration.getJeiHelpers().getGuiHelper())
+                new BlockTransmutationRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
+                new EntityHarvestingRecipeCategory(registration.getJeiHelpers().getGuiHelper())
         );
     }
 
@@ -30,6 +32,10 @@ public class ModJeiPlugin implements IModPlugin {
                 BlockTransmutationRecipeCategory.TYPE,
                 BlockTransmutationRecipeCategory.getRecipes()
         );
+        registration.addRecipes(
+                EntityHarvestingRecipeCategory.TYPE,
+                EntityHarvestingRecipeCategory.getRecipes()
+        );
     }
 
     @Override
@@ -37,6 +43,7 @@ public class ModJeiPlugin implements IModPlugin {
         BuiltInRegistries.ITEM.forEach(item -> {
             if (item instanceof BrushItem) {
                 registration.addRecipeCatalyst(new ItemStack(item), BlockTransmutationRecipeCategory.TYPE);
+                registration.addRecipeCatalyst(new ItemStack(item), EntityHarvestingRecipeCategory.TYPE);
             }
         });
     }

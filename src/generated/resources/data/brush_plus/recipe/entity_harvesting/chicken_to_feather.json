@@ -1,0 +1,21 @@
+{
+  "type": "brush_plus:entity_harvesting",
+  "drops": [
+    {
+      "chance": 0.3,
+      "item": {
+        "count": 1,
+        "id": "minecraft:feather"
+      }
+    },
+    {
+      "chance": 0.3,
+      "item": {
+        "count": 1,
+        "id": "minecraft:feather"
+      }
+    }
+  ],
+  "entity": "minecraft:chicken",
+  "total_ticks": 40
+}

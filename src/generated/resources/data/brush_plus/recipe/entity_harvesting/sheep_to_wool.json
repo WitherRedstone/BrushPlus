@@ -1,0 +1,20 @@
+{
+  "type": "brush_plus:entity_harvesting",
+  "drops": [
+    {
+      "item": {
+        "count": 1,
+        "id": "minecraft:white_wool"
+      }
+    },
+    {
+      "chance": 0.5,
+      "item": {
+        "count": 1,
+        "id": "minecraft:white_wool"
+      }
+    }
+  ],
+  "entity": "minecraft:sheep",
+  "total_ticks": 40
+}

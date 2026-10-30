@@ -1,6 +1,7 @@
 package com.chinaex123.brush_plus.data;
 
 import com.chinaex123.brush_plus.data.builder.BlockTransmutationRecipeBuilder;
+import com.chinaex123.brush_plus.data.builder.EntityHarvestingRecipeBuilder;
 import com.chinaex123.brush_plus.init.BPItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
@@ -8,6 +9,7 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -70,6 +72,7 @@ public class ModRecipesProvider extends RecipeProvider implements IConditionBuil
                 .save(recipeOutput);
 
         buildBlockTransmutationRecipes(recipeOutput);
+        buildEntityHarvestingRecipes(recipeOutput);
     }
 
     /** 方块转化配方 */
@@ -250,6 +253,24 @@ public class ModRecipesProvider extends RecipeProvider implements IConditionBuil
 //                .noDrop()
 //                .save(output, "xxx_to_yyy");
 
+    }
+
+    /** 实体采集配方 */
+    private void buildEntityHarvestingRecipes(@NotNull RecipeOutput output) {
+        // 羊 → 掉落羊毛
+        EntityHarvestingRecipeBuilder.builder()
+                .setEntity(EntityType.SHEEP)
+                .addDrop(new ItemStack(Items.WHITE_WOOL, 1))
+                .addDrop(new ItemStack(Items.WHITE_WOOL, 1), 0.5f)
+                .setTotalTicks(40)
+                .save(output, "sheep_to_wool");
+        // 鸡 → 掉落羽毛
+        EntityHarvestingRecipeBuilder.builder()
+                .setEntity(EntityType.CHICKEN)
+                .addDrop(new ItemStack(Items.FEATHER, 1), 0.3f)
+                .addDrop(new ItemStack(Items.FEATHER, 1), 0.3f)
+                .setTotalTicks(40)
+                .save(output, "chicken_to_feather");
     }
 
 }

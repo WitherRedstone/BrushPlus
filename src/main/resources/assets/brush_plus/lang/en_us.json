@@ -9,5 +9,8 @@
   "jei.brush_plus.block_transmutation.title": "Brush Block Transmutation",
   "jei.brush_plus.block_transmutation.time": "Brush time: %.1f sec",
   "jei.brush_plus.block_transmutation.result_chance": "Conversion chance: %s",
-  "jei.brush_plus.block_transmutation.drop_chance": "Drop chance: %s"
+  "jei.brush_plus.block_transmutation.drop_chance": "Drop chance: %s",
+  "jei.brush_plus.entity_harvesting.title": "Brush Entity Harvesting",
+  "jei.brush_plus.entity_harvesting.time": "Brush time: %.1f sec",
+  "jei.brush_plus.entity_harvesting.drop_chance": "Drop chance: %s"
 }
