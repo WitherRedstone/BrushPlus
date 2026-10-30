@@ -33,6 +33,7 @@ import java.util.Optional;
 public class BrushBlockTransmutationHandler {
 
     private static final Map<String, Integer> PROGRESS_MAP = new HashMap<>();
+    private static final Map<String, Long> LAST_TARGET_MAP = new HashMap<>();
 
     public static void clearAllProgress(ServerPlayer player) {
         String uuid = player.getStringUUID();
@@ -45,6 +46,7 @@ public class BrushBlockTransmutationHandler {
             BlockPos pos = BlockPos.of(posAsLong);
             PacketDistributor.sendToPlayer(player, new BrushProgressS2CPacket(pos, 0, 0));
         }
+        LAST_TARGET_MAP.remove(uuid);
     }
 
     public static void onBrushTick(ServerPlayer player, ItemStack heldItem) {
@@ -58,7 +60,20 @@ public class BrushBlockTransmutationHandler {
         BlockPos pos = blockHit.getBlockPos();
         BlockState state = level.getBlockState(pos);
 
-        String progressKey = player.getStringUUID() + ":" + pos.asLong();
+        String uuid = player.getStringUUID();
+        long currentTarget = pos.asLong();
+        Long lastTarget = LAST_TARGET_MAP.get(uuid);
+        if (lastTarget != null && lastTarget != currentTarget) {
+            String oldKey = uuid + ":" + lastTarget;
+            if (PROGRESS_MAP.containsKey(oldKey)) {
+                PROGRESS_MAP.remove(oldKey);
+                BlockPos oldPos = BlockPos.of(lastTarget);
+                PacketDistributor.sendToPlayer(player, new BrushProgressS2CPacket(oldPos, 0, 0));
+            }
+        }
+        LAST_TARGET_MAP.put(uuid, currentTarget);
+
+        String progressKey = uuid + ":" + currentTarget;
 
         BlockTransmutationRecipe.Input input = new BlockTransmutationRecipe.Input() {
             @Override
