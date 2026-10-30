@@ -257,20 +257,27 @@ public class ModRecipesProvider extends RecipeProvider implements IConditionBuil
 
     /** 实体采集配方 */
     private void buildEntityHarvestingRecipes(@NotNull RecipeOutput output) {
-        // 羊 → 掉落羊毛
+        // 羊 → 羊毛
         EntityHarvestingRecipeBuilder.builder()
                 .setEntity(EntityType.SHEEP)
                 .addDrop(new ItemStack(Items.WHITE_WOOL, 1))
                 .addDrop(new ItemStack(Items.WHITE_WOOL, 1), 0.5f)
                 .setTotalTicks(40)
                 .save(output, "sheep_to_wool");
-        // 鸡 → 掉落羽毛
+        // 鸡 → 羽毛
         EntityHarvestingRecipeBuilder.builder()
                 .setEntity(EntityType.CHICKEN)
                 .addDrop(new ItemStack(Items.FEATHER, 1), 0.3f)
                 .addDrop(new ItemStack(Items.FEATHER, 1), 0.3f)
                 .setTotalTicks(40)
                 .save(output, "chicken_to_feather");
+        // 苦力怕 → 火药
+        EntityHarvestingRecipeBuilder.builder()
+                .setEntity(EntityType.CREEPER)
+                .addDrop(new ItemStack(Items.GUNPOWDER, 1), 0.3f)
+                .addDrop(new ItemStack(Items.GUNPOWDER, 1), 0.3f)
+                .setTotalTicks(80)
+                .save(output, "creeper_to_gunpowder");
     }
 
 }

@@ -15,6 +15,7 @@ public class BPForgeEvents {
         if (event.getEntity() instanceof ServerPlayer player
                 && event.getItem().getItem() instanceof BrushItem) {
             BrushBlockTransmutationHandler.clearAllProgress(player);
+            BrushEntityHarvestingHandler.clearAllProgress(player);
         }
     }
 
@@ -23,6 +24,7 @@ public class BPForgeEvents {
         if (event.getEntity() instanceof ServerPlayer player
                 && event.getItem().getItem() instanceof BrushItem) {
             BrushBlockTransmutationHandler.clearAllProgress(player);
+            BrushEntityHarvestingHandler.clearAllProgress(player);
         }
     }
 }

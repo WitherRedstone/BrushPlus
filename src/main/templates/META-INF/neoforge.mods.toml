@@ -7,6 +7,7 @@ modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 authors="ChinaEX123"
+logoFile="logo.png"
 description='''
 Add more features to the brush.
 '''
@@ -33,5 +34,12 @@ config="${mod_id}.mixins.json"
     modId = "kubejs"
     type = "optional"
     versionRange = "[2101.7.2-build.309,)"
+    ordering = "NONE"
+    side = "BOTH"
+
+[[dependencies."${mod_id}"]]
+    modId = "jei"
+    type = "optional"
+    versionRange = "[19.21.1.304,)"
     ordering = "NONE"
     side = "BOTH"

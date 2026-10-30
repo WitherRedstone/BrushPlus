@@ -3,7 +3,8 @@
   "package": "com.chinaex123.brush_plus.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "BrushItemMixin"
+    "BrushItemMixin",
+    "ItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

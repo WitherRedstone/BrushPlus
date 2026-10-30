@@ -2,6 +2,7 @@ package com.chinaex123.brush_plus.event;
 
 import com.chinaex123.brush_plus.crafting.recipe.EntityHarvestingRecipe;
 import com.chinaex123.brush_plus.init.BPRecipes;
+import com.chinaex123.brush_plus.network.EntityBrushProgressS2CPacket;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -15,8 +16,7 @@ import net.minecraft.world.item.BrushItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +26,24 @@ import java.util.Optional;
 public class BrushEntityHarvestingHandler {
 
     private static final Map<String, Integer> PROGRESS_MAP = new HashMap<>();
+    private static final Map<String, Long> LAST_TARGET_MAP = new HashMap<>();
+    private static final Map<String, Integer> LAST_REMAINING_MAP = new HashMap<>();
+
+    public static boolean isValidTarget(ServerPlayer player, Entity target) {
+        if (target == null || !target.isAlive()) return false;
+        if (target.isSpectator()) return false;
+
+        Level level = player.level();
+        ResourceLocation targetEntityId = BuiltInRegistries.ENTITY_TYPE.getKey(target.getType());
+        EntityHarvestingRecipe.Input input = () -> targetEntityId;
+
+        List<RecipeHolder<EntityHarvestingRecipe>> recipes =
+                level.getRecipeManager().getAllRecipesFor(BPRecipes.ENTITY_HARVESTING_RECIPE);
+
+        return recipes.stream()
+                .map(RecipeHolder::value)
+                .anyMatch(r -> r.matches(input, level));
+    }
 
     public static void clearAllProgress(ServerPlayer player) {
         String uuid = player.getStringUUID();
@@ -34,27 +52,47 @@ public class BrushEntityHarvestingHandler {
                 .toList();
         for (String key : keys) {
             PROGRESS_MAP.remove(key);
+            int entityId = Integer.parseInt(key.substring(uuid.length() + 1));
+            PacketDistributor.sendToPlayer(player,
+                    new EntityBrushProgressS2CPacket(entityId, 0, 0));
         }
+        LAST_TARGET_MAP.remove(uuid);
+        LAST_REMAINING_MAP.remove(uuid);
     }
 
-    public static void onBrushTick(ServerPlayer player, ItemStack heldItem) {
+    public static void onBrushTick(ServerPlayer player, ItemStack heldItem, Entity target,
+                                   int remainingUseDuration) {
         Level level = player.level();
         if (!(heldItem.getItem() instanceof BrushItem)) return;
+        if (target == null || !target.isAlive()) return;
 
-        HitResult hit = player.pick(5.0D, 0.0F, false);
-        if (!(hit instanceof EntityHitResult entityHit)) return;
+        if (remainingUseDuration > 195) {
+            return;
+        }
 
-        Entity target = entityHit.getEntity();
-        ResourceLocation targetEntityId = BuiltInRegistries.ENTITY_TYPE.getKey(target.getType());
+        String uuid = player.getStringUUID();
 
-        String progressKey = player.getStringUUID() + ":" + target.getId();
+        Integer lastRemaining = LAST_REMAINING_MAP.get(uuid);
+        if (lastRemaining != null && lastRemaining - remainingUseDuration != 1) {
+            resetProgress(player, uuid);
+        }
+        LAST_REMAINING_MAP.put(uuid, remainingUseDuration);
 
-        EntityHarvestingRecipe.Input input = new EntityHarvestingRecipe.Input() {
-            @Override
-            public ResourceLocation getEntityId() {
-                return targetEntityId;
+        long currentTarget = target.getId();
+        Long lastTarget = LAST_TARGET_MAP.get(uuid);
+        if (lastTarget != null && lastTarget != currentTarget) {
+            String oldKey = uuid + ":" + lastTarget;
+            if (PROGRESS_MAP.containsKey(oldKey)) {
+                PROGRESS_MAP.remove(oldKey);
+                PacketDistributor.sendToPlayer(player,
+                        new EntityBrushProgressS2CPacket((int) (long) lastTarget, 0, 0));
             }
-        };
+        }
+        LAST_TARGET_MAP.put(uuid, currentTarget);
+
+        String progressKey = uuid + ":" + currentTarget;
+        ResourceLocation targetEntityId = BuiltInRegistries.ENTITY_TYPE.getKey(target.getType());
+        EntityHarvestingRecipe.Input input = () -> targetEntityId;
 
         List<RecipeHolder<EntityHarvestingRecipe>> recipes =
                 level.getRecipeManager().getAllRecipesFor(BPRecipes.ENTITY_HARVESTING_RECIPE);
@@ -65,7 +103,11 @@ public class BrushEntityHarvestingHandler {
                 .findFirst();
 
         if (matchedRecipe.isEmpty()) {
-            PROGRESS_MAP.remove(progressKey);
+            if (PROGRESS_MAP.containsKey(progressKey)) {
+                PROGRESS_MAP.remove(progressKey);
+                PacketDistributor.sendToPlayer(player,
+                        new EntityBrushProgressS2CPacket(target.getId(), 0, 0));
+            }
             return;
         }
 
@@ -78,8 +120,13 @@ public class BrushEntityHarvestingHandler {
 
         int currentProgress = PROGRESS_MAP.getOrDefault(progressKey, 0) + 1;
 
+        PacketDistributor.sendToPlayer(player,
+                new EntityBrushProgressS2CPacket(target.getId(), currentProgress, recipe.totalTicks()));
+
         if (currentProgress >= recipe.totalTicks()) {
             PROGRESS_MAP.remove(progressKey);
+            PacketDistributor.sendToPlayer(player,
+                    new EntityBrushProgressS2CPacket(target.getId(), 0, 0));
 
             for (EntityHarvestingRecipe.DropEntry entry : recipe.validDrops()) {
                 if (level.getRandom().nextFloat() < entry.chance()) {
@@ -105,13 +152,29 @@ public class BrushEntityHarvestingHandler {
             EquipmentSlot slot = hand == InteractionHand.MAIN_HAND
                     ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
             heldItem.hurtAndBreak(1, player, slot);
+
+            player.stopUsingItem();
+            resetProgress(player, uuid);
         } else {
             PROGRESS_MAP.put(progressKey, currentProgress);
         }
     }
 
+    private static void resetProgress(ServerPlayer player, String uuid) {
+        var keys = PROGRESS_MAP.keySet().stream()
+                .filter(k -> k.startsWith(uuid + ":"))
+                .toList();
+        for (String key : keys) {
+            PROGRESS_MAP.remove(key);
+            int entityId = Integer.parseInt(key.substring(uuid.length() + 1));
+            PacketDistributor.sendToPlayer(player,
+                    new EntityBrushProgressS2CPacket(entityId, 0, 0));
+        }
+        LAST_TARGET_MAP.remove(uuid);
+    }
+
     private static void spawnBrushParticles(Level level, Entity target) {
-        ServerLevel serverLevel = (ServerLevel) level;
+        if (!(level instanceof ServerLevel serverLevel)) return;
         double x = target.getX();
         double y = target.getY() + target.getBbHeight() / 2.0;
         double z = target.getZ();

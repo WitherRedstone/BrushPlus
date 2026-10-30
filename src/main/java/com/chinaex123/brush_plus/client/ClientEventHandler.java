@@ -2,8 +2,10 @@ package com.chinaex123.brush_plus.client;
 
 import com.chinaex123.brush_plus.BrushPlus;
 import com.chinaex123.brush_plus.client.renderer.BrushProgressRenderer;
+import com.chinaex123.brush_plus.client.renderer.EntityBrushProgressRenderer;
 import com.chinaex123.brush_plus.config.BPClientConfig;
 import com.chinaex123.brush_plus.network.client.BrushProgressClientState;
+import com.chinaex123.brush_plus.network.client.EntityBrushProgressClientState;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexSorting;
@@ -35,6 +37,7 @@ public class ClientEventHandler {
 
         poseStack.pushPose();
         BrushProgressRenderer.renderAll(poseStack, event.getCamera());
+        EntityBrushProgressRenderer.renderAll(poseStack, event.getCamera());
         poseStack.popPose();
 
         modelViewStack.popMatrix();
@@ -43,5 +46,6 @@ public class ClientEventHandler {
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
         BrushProgressClientState.INSTANCE.tick();
+        EntityBrushProgressClientState.INSTANCE.tick();
     }
 }

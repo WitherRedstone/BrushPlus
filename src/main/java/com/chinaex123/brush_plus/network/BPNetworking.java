@@ -19,5 +19,11 @@ public class BPNetworking {
                 BrushProgressS2CPacket.STREAM_CODEC,
                 BrushProgressS2CPacket::handle
         );
+
+        registrar.playToClient(
+                EntityBrushProgressS2CPacket.TYPE,
+                EntityBrushProgressS2CPacket.STREAM_CODEC,
+                EntityBrushProgressS2CPacket::handle
+        );
     }
 }

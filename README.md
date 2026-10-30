@@ -194,39 +194,3 @@ ServerEvents.recipes(event => {
     ).id('brush_plus:pig_1')
 })
 ```
-
-### JSON 配方格式
-
-如果你更习惯用 JSON 数据包定义配方，格式如下：
-
-```json
-{
-    "type": "brush_plus:block_transmutation",
-    "ingredient": {
-        "tag": "c:ores/coal"
-    },
-    "result_blocks": [
-        { "block": "minecraft:cobblestone", "chance": 0.25 },
-        { "block": "minecraft:deepslate", "chance": 0.75 }
-    ],
-    "drops": [
-        { "item": { "id": "minecraft:coal", "count": 2 }, "chance": 1.0 },
-        { "item": { "id": "minecraft:coal", "count": 1 }, "chance": 0.5 }
-    ],
-    "total_ticks": 40
-}
-```
-
-### 实体采集 JSON 配方格式
-
-```json
-{
-    "type": "brush_plus:entity_harvesting",
-    "entity": "minecraft:cow",
-    "drops": [
-        { "item": { "id": "minecraft:leather", "count": 1 }, "chance": 1.0 },
-        { "item": { "id": "minecraft:beef", "count": 1 }, "chance": 0.5 }
-    ],
-    "total_ticks": 40
-}
-```
