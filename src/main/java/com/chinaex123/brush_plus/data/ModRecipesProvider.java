@@ -96,10 +96,15 @@ public class ModRecipesProvider extends RecipeProvider implements IConditionBuil
         // 雪 → 雪球
         BlockTransmutationRecipeBuilder.builder()
                 .setIngredient(Blocks.SNOW)
-                .addResultBlock(Blocks.AIR)
                 .addDrop(Items.SNOWBALL)
                 .setTotalTicks(40)
                 .save(output, "snow_to_snowball");
+        // 岩浆块 → 下界岩
+        BlockTransmutationRecipeBuilder.builder()
+                .setIngredient(Blocks.MAGMA_BLOCK)
+                .addResultBlock(Blocks.NETHERRACK)
+                .setTotalTicks(80)
+                .save(output, "magma_block_to_netherrock");
 
 
         // 煤矿石 → 煤炭

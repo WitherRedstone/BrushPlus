@@ -7,5 +7,6 @@
     {
       "block": "minecraft:dirt"
     }
-  ]
+  ],
+  "total_ticks": 40
 }

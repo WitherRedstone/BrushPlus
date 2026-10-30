@@ -18,8 +18,7 @@ public class BPRecipes {
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS =
             DeferredRegister.create(BuiltInRegistries.RECIPE_SERIALIZER, BrushPlus.MODID);
 
-    public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<?>> BLOCK_TRANSMUTATION_SERIALIZER =
-            RECIPE_SERIALIZERS.register("block_transmutation", BlockTransmutationRecipeSerializer::new);
+    public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<?>> BLOCK_TRANSMUTATION_SERIALIZER = RECIPE_SERIALIZERS.register("block_transmutation", BlockTransmutationRecipeSerializer::new);
 
     public static RecipeType<BlockTransmutationRecipe> BLOCK_TRANSMUTATION_RECIPE;
 

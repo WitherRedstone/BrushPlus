@@ -42,6 +42,22 @@ repositories {
         name = "Jared's maven"
         url = "https://maven.blamejared.com/"
     }
+
+    // Kubejs
+    maven {
+        url "https://maven.latvian.dev/releases"
+        content {
+            includeGroup "dev.latvian.mods"
+            includeGroup "dev.latvian.apps"
+        }
+    }
+    maven {
+        url 'https://jitpack.io'
+        content {
+            includeGroup "com.github.rtyley"
+        }
+    }
+
 }
 
 base {
@@ -100,10 +116,11 @@ configurations {
 
 dependencies {
     implementation "curse.maven:jei-238222:7420587"
-    
+    implementation "dev.latvian.mods:rhino:2101.2.7-build.72"
+    implementation "dev.latvian.mods:kubejs-neoforge:2101.7.2-build.336"
+    runtimeOnly 'com.madgag:animated-gif-lib:1.4'
+
     localRuntime "curse.maven:jade-324717:7545219"
-    localRuntime "curse.maven:kubejs-238086:7278501"
-    localRuntime "curse.maven:rhino-416294:7104526"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {

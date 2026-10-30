@@ -1,0 +1,11 @@
+{
+  "type": "brush_plus:block_transmutation",
+  "ingredient": {
+    "item": "minecraft:magma_block"
+  },
+  "result_blocks": [
+    {
+      "block": "minecraft:netherrack"
+    }
+  ]
+}
