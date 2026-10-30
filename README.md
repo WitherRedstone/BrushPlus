@@ -1,4 +1,213 @@
-# Brush Plus
+# 刷子增强（Brush Plus）功能分类文档
+
+[English](#english) | [中文](#中文)
+
+---
+
+# **English**
+
+## Introduction
+
+Add more functionality to Minecraft's brush!
+
+## Features
+
+Brush Plus expands the uses of the vanilla brush by introducing **Block Transmutation** and **Entity Harvesting** systems:
+- Hold right-click on a block with a brush. After some time, the block will transform into another block and may drop items.
+- Hold right-click on an entity with a brush. After some time, the entity will drop items.
+
+### New Brushes
+
+- Iron Brush, Gold Brush, Diamond Brush, Netherite Brush
+
+### Block Transmutation Recipe
+
+A block transmutation recipe defines what happens when you brush a block:
+
+- **ingredient** — The matching block ingredient (supports tags)
+- **result_blocks** — A list of result blocks after transmutation, each with a chance
+- **drops** — A list of item drops, each with a chance
+- **total_ticks** — The total number of ticks to hold the brush
+
+If `result_blocks` is empty, the block stays unchanged (items only drop).
+
+### Entity Harvesting Recipe
+
+An entity harvesting recipe defines what happens when you brush an entity:
+
+- **entity** — The matching entity type
+- **drops** — A list of item drops, each with a chance
+- **total_ticks** — The total number of ticks to hold the brush
+
+Brushing an entity will not remove it, only drop items.
+
+---
+
+## KubeJS Integration
+
+Brush Plus provides KubeJS recipe schema support, allowing you to define custom block transmutation and entity harvesting recipes in KubeJS scripts.
+
+### Recipe Types
+
+- `brush_plus:block_transmutation` — Block Transmutation
+- `brush_plus:entity_harvesting` — Entity Harvesting
+
+### Block Transmutation
+
+#### Constructor Parameters
+
+```
+event.recipes.brush_plus.block_transmutation(ingredient, result_blocks, drops, total_ticks)
+```
+
+- `ingredient` — Ingredient, **required**, the matching block ingredient
+- `result_blocks` — Result blocks, optional, default `[]`. Multiple formats supported:
+  - String: `'minecraft:cobblestone'` (single block, chance defaults to 1.0)
+  - Object array: `[{ block: 'minecraft:iron_block', chance: 0.25 }]`
+  - Empty array: `[]` (no block transmutation)
+- `drops` — Item drops, optional, default `[]`. Multiple formats supported:
+  - String: `'minecraft:netherite_ingot'` (single item, chance defaults to 1.0)
+  - Object array: `[{ item: Item.of('minecraft:coal', 2), chance: 1.0 }]`
+  - Empty array: `[]` (no item drops)
+- `total_ticks` — Integer, optional, default `80`, the total number of ticks to hold
+
+#### Script Examples
+
+```javascript
+ServerEvents.recipes(event => {
+    // Simplified: pass strings directly
+    event.recipes.brush_plus.block_transmutation(
+        Ingredient.of('#minecraft:logs'),
+        'minecraft:cobblestone',
+        'minecraft:netherite_ingot',
+        40
+    ).id('brush_plus:example_1')
+
+    // Full: result_blocks and drops as object arrays
+    event.recipes.brush_plus.block_transmutation(
+        Ingredient.of('minecraft:diamond_block'),
+        [
+            { block: 'minecraft:iron_block', chance: 0.25 }
+        ],
+        [
+            { item: Item.of('minecraft:netherite_ingot', 2), chance: 1.0 }
+        ],
+        40
+    ).id('brush_plus:example_2')
+
+    // Mixed: result_blocks as string, drops as object array
+    event.recipes.brush_plus.block_transmutation(
+        Ingredient.of('minecraft:stone'),
+        'minecraft:cobblestone',
+        [
+            { item: Item.of('minecraft:coal', 2), chance: 1.0 },
+            { item: Item.of('minecraft:netherite_ingot', 1), chance: 0.2 }
+        ],
+        80
+    ).id('brush_plus:example_3')
+
+    // Mixed: result_blocks as object array, drops as string
+    event.recipes.brush_plus.block_transmutation(
+        Ingredient.of('minecraft:bone_block'),
+        [
+            { block: 'minecraft:cobblestone', chance: 0.01 }
+        ],
+        'minecraft:netherite_ingot',
+        80
+    ).id('brush_plus:example_4')
+
+    // Block transmutation only, no item drops
+    event.recipes.brush_plus.block_transmutation(
+        Ingredient.of('minecraft:sand'),
+        'minecraft:cobblestone',
+        [],
+        80
+    ).id('brush_plus:example_5')
+
+    // Item drops only, no block transmutation
+    event.recipes.brush_plus.block_transmutation(
+        Ingredient.of('minecraft:iron_block'),
+        [],
+        'minecraft:diamond',
+        40
+    ).id('brush_plus:example_6')
+
+    // Multiple result block chances + multiple item drops
+    event.recipes.brush_plus.block_transmutation(
+        Ingredient.of('minecraft:deepslate'),
+        [
+            { block: 'minecraft:cobblestone', chance: 0.05 },
+            { block: 'minecraft:stone', chance: 0.01 }
+        ],
+        [
+            { item: Item.of('minecraft:coal', 2), chance: 1.0 },
+            { item: Item.of('minecraft:netherite_ingot', 1), chance: 0.2 }
+        ],
+        40
+    ).id('brush_plus:example_7')
+})
+```
+
+### Entity Harvesting
+
+#### Constructor Parameters
+
+```
+event.recipes.brush_plus.entity_harvesting(entity, drops, total_ticks)
+```
+
+- `entity` — String, **required**, the matching entity type ID (e.g. `'minecraft:cow'`)
+- `drops` — Item drops, optional, default `[]`. Multiple formats supported:
+  - String: `'minecraft:leather'` (single item, chance defaults to 1.0)
+  - Object array: `[{ item: Item.of('minecraft:leather', 2), chance: 1.0 }]`
+  - Empty array: `[]` (no item drops)
+- `total_ticks` — Integer, optional, default `80`, the total number of ticks to hold
+
+#### Script Examples
+
+```javascript
+ServerEvents.recipes(event => {
+    // Simplified: pass strings directly
+    event.recipes.brush_plus.entity_harvesting(
+        'minecraft:cow',
+        'minecraft:leather',
+        40
+    ).id('brush_plus:cow_1')
+
+    // Full: drops as object array
+    event.recipes.brush_plus.entity_harvesting(
+        'minecraft:sheep',
+        [
+            { item: Item.of('minecraft:white_wool', 1), chance: 1.0 },
+            { item: Item.of('minecraft:white_wool', 1), chance: 0.5 }
+        ],
+        40
+    ).id('brush_plus:sheep_1')
+
+    // Multiple item drops
+    event.recipes.brush_plus.entity_harvesting(
+        'minecraft:chicken',
+        [
+            { item: Item.of('minecraft:feather', 1), chance: 1.0 },
+            { item: Item.of('minecraft:egg', 1), chance: 0.3 }
+        ],
+        40
+    ).id('brush_plus:chicken_1')
+
+    // No item drops
+    event.recipes.brush_plus.entity_harvesting(
+        'minecraft:pig',
+        [],
+        40
+    ).id('brush_plus:pig_1')
+})
+```
+
+---
+
+# **中文**
+
+## 简介
 
 为 Minecraft 的刷子添加更多功能！
 
