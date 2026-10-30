@@ -26,6 +26,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.Nullable;
 
@@ -125,7 +126,10 @@ public class BlockTransmutationRecipeCategory implements IRecipeCategory<RecipeH
         BlockTransmutationRecipe recipe = holder.value();
 
         List<ItemStack> inputs = List.of(recipe.ingredient().getItems());
-        List<BlockTransmutationRecipe.ResultBlockEntry> resultBlocks = recipe.resultBlocks();
+        // 过滤掉 AIR 方块，不渲染（避免空槽）
+        List<BlockTransmutationRecipe.ResultBlockEntry> resultBlocks = recipe.resultBlocks().stream()
+                .filter(e -> !e.blockId().equals(BuiltInRegistries.BLOCK.getKey(Blocks.AIR)))
+                .toList();
         int resultCount = resultBlocks.size();
 
         builder.addSlot(RecipeIngredientRole.INPUT, SOURCE_X, SOURCE_Y)

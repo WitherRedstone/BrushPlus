@@ -99,6 +99,7 @@ public class ModRecipesProvider extends RecipeProvider implements IConditionBuil
         // 雪 → 雪球
         BlockTransmutationRecipeBuilder.builder()
                 .setIngredient(Blocks.SNOW)
+                .addResultBlock(Blocks.AIR)
                 .addDrop(Items.SNOWBALL)
                 .setTotalTicks(40)
                 .save(output, "snow_to_snowball");

@@ -11,5 +11,10 @@
   "ingredient": {
     "item": "minecraft:snow"
   },
+  "result_blocks": [
+    {
+      "block": "minecraft:air"
+    }
+  ],
   "total_ticks": 40
 }
