@@ -1,5 +1,13 @@
 {
   "type": "brush_plus:block_transmutation",
+  "drops": [
+    {
+      "item": {
+        "count": 1,
+        "id": "minecraft:magma_cream"
+      }
+    }
+  ],
   "ingredient": {
     "item": "minecraft:magma_block"
   },

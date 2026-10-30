@@ -108,6 +108,20 @@ ServerEvents.recipes(event => {
         'minecraft:diamond',
         40
     ).id('brush_plus:example_6')
+
+    // 多个结果方块概率 + 多个掉落物
+    event.recipes.brush_plus.block_transmutation(
+        Ingredient.of('minecraft:deepslate'),
+        [
+            { block: 'minecraft:cobblestone', chance: 0.05 },
+            { block: 'minecraft:stone', chance: 0.01 }
+        ],
+        [
+            { item: Item.of('minecraft:coal', 2), chance: 1.0 },
+            { item: Item.of('minecraft:netherite_ingot', 1), chance: 0.2 }
+        ],
+        40
+    ).id('brush_plus:example_7')
 })
 ```
 

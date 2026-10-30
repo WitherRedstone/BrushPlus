@@ -1,0 +1,29 @@
+{
+  "type": "brush_plus:block_transmutation",
+  "drops": [
+    {
+      "chance": 0.8,
+      "item": {
+        "count": 1,
+        "id": "minecraft:netherrack"
+      }
+    },
+    {
+      "chance": 0.05,
+      "item": {
+        "count": 1,
+        "id": "minecraft:netherite_scrap"
+      }
+    }
+  ],
+  "ingredient": {
+    "tag": "c:ores/netherite_scrap"
+  },
+  "result_blocks": [
+    {
+      "block": "minecraft:netherrack",
+      "chance": 0.05
+    }
+  ],
+  "total_ticks": 40
+}

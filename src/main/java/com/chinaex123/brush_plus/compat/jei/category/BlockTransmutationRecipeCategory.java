@@ -94,9 +94,9 @@ public class BlockTransmutationRecipeCategory implements IRecipeCategory<RecipeH
 
         int ticks = recipe.value().totalTicks();
         if (ticks > 0) {
-            drawCenteredString(guiGraphics,
+            drawLeftString(guiGraphics,
                     Component.translatable("jei.brush_plus.block_transmutation.time", ticks / 20.0),
-                    WIDTH / 2, TIME_Y);
+                    SOURCE_X, TIME_Y);
         }
     }
 
@@ -111,10 +111,10 @@ public class BlockTransmutationRecipeCategory implements IRecipeCategory<RecipeH
         guiGraphics.pose().popPose();
     }
 
-    private void drawCenteredString(GuiGraphics guiGraphics, Component text, int centerX, int y) {
+    private void drawLeftString(GuiGraphics guiGraphics, Component text, int x, int y) {
         Font font = Minecraft.getInstance().font;
         FormattedCharSequence sequence = text.getVisualOrderText();
-        guiGraphics.drawString(font, sequence, centerX - font.width(sequence) / 2, y, 0x555555, false);
+        guiGraphics.drawString(font, sequence, x, y, 0x555555, false);
     }
 
     @Override

@@ -29,6 +29,10 @@
     {
       "block": "minecraft:cobblestone",
       "chance": 0.5
+    },
+    {
+      "block": "minecraft:cobbled_deepslate",
+      "chance": 0.25
     }
   ],
   "total_ticks": 40

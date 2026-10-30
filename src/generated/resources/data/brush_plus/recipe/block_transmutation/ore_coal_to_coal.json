@@ -3,7 +3,7 @@
   "drops": [
     {
       "item": {
-        "count": 2,
+        "count": 1,
         "id": "minecraft:coal"
       }
     },
@@ -28,6 +28,10 @@
   "result_blocks": [
     {
       "block": "minecraft:cobblestone",
+      "chance": 0.25
+    },
+    {
+      "block": "minecraft:cobbled_deepslate",
       "chance": 0.25
     }
   ],
