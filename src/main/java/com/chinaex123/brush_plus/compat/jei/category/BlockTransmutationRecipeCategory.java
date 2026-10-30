@@ -2,6 +2,7 @@ package com.chinaex123.brush_plus.compat.jei.category;
 
 import com.chinaex123.brush_plus.BrushPlus;
 import com.chinaex123.brush_plus.crafting.recipe.BlockTransmutationRecipe;
+import com.chinaex123.brush_plus.init.BPItems;
 import com.chinaex123.brush_plus.init.BPRecipes;
 import com.google.common.collect.Lists;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -63,13 +64,15 @@ public class BlockTransmutationRecipeCategory implements IRecipeCategory<RecipeH
 
     private final IDrawable iconDraw;
     private final IDrawable dropChanceSlotBg;
+    private final ItemStack iconBlockStack;
 
     public BlockTransmutationRecipeCategory(IGuiHelper guiHelper) {
-        this.iconDraw = guiHelper.createDrawableItemLike(Items.BRUSH);
+        this.iconDraw = guiHelper.createDrawableItemLike(BPItems.DIAMOND_BRUSH);
         ResourceLocation bg = BrushPlus.id("textures/gui/jei/drop_chance.png");
         this.dropChanceSlotBg = guiHelper.drawableBuilder(bg, 0, 0, 18, 18)
                 .setTextureSize(18, 18)
                 .build();
+        this.iconBlockStack = new ItemStack(Items.STONE);
     }
 
     public static List<RecipeHolder<BlockTransmutationRecipe>> getRecipes() {
@@ -206,6 +209,29 @@ public class BlockTransmutationRecipeCategory implements IRecipeCategory<RecipeH
     @Override
     @Nullable
     public IDrawable getIcon() {
-        return iconDraw;
+        return new IDrawable() {
+            @Override
+            public int getWidth() {
+                return iconDraw.getWidth();
+            }
+
+            @Override
+            public int getHeight() {
+                return iconDraw.getHeight();
+            }
+
+            @Override
+            public void draw(GuiGraphics guiGraphics, int xOffset, int yOffset) {
+                iconDraw.draw(guiGraphics, xOffset, yOffset);
+                int iconSize = 8;
+                int iconX = xOffset + getWidth() - iconSize;
+                int iconY = yOffset + getHeight() - iconSize;
+                guiGraphics.pose().pushPose();
+                guiGraphics.pose().translate(iconX, iconY, 200.0);
+                guiGraphics.pose().scale(0.5f, 0.5f, 1.0f);
+                guiGraphics.renderItem(iconBlockStack, 0, 0);
+                guiGraphics.pose().popPose();
+            }
+        };
     }
 }

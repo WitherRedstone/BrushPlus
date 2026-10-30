@@ -2,6 +2,7 @@ package com.chinaex123.brush_plus.compat.jei.category;
 
 import com.chinaex123.brush_plus.BrushPlus;
 import com.chinaex123.brush_plus.crafting.recipe.EntityHarvestingRecipe;
+import com.chinaex123.brush_plus.init.BPItems;
 import com.chinaex123.brush_plus.init.BPRecipes;
 import com.google.common.collect.Lists;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -30,21 +31,26 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class EntityHarvestingRecipeCategory implements IRecipeCategory<RecipeHolder<EntityHarvestingRecipe>> {
 
     public static final RecipeType<RecipeHolder<EntityHarvestingRecipe>> TYPE = RecipeType.createRecipeHolderType(BrushPlus.id("entity_harvesting"));
     private static final MutableComponent TITLE = Component.translatable("jei.brush_plus.entity_harvesting.title");
 
+    /** JEI画布 */
     public static final int WIDTH = 120;
     public static final int HEIGHT = 65;
 
+    /** 实体槽位 */
     private static final int SOURCE_X = 10;
     private static final int SOURCE_Y = 23;
-    private static final int DROP_X = 70;
+    /** 掉落物槽位 */
+    private static final int DROP_X = 94;
     private static final int DROP_SLOT_SIZE = 18;
     private static final int DROP_SLOT_GAP = 2;
 
+    /** 刷子位置 */
     private static final float BRUSH_SCALE = 1.5f;
     private static final int BRUSH_SIZE = (int) (16 * BRUSH_SCALE);
     private static final int BRUSH_X = (SOURCE_X + DROP_X + 16) / 2 - BRUSH_SIZE / 2;
@@ -52,17 +58,20 @@ public class EntityHarvestingRecipeCategory implements IRecipeCategory<RecipeHol
     private static final int BRUSH_PRESS_OFFSET = 5;
     private static final long BRUSH_ANIM_PERIOD_MS = 600;
 
+    /** 时间文本坐标 */
     private static final int TIME_Y = 48;
 
     private final IDrawable iconDraw;
     private final IDrawable dropChanceSlotBg;
+    private final ItemStack iconEggStack;
 
     public EntityHarvestingRecipeCategory(IGuiHelper guiHelper) {
-        this.iconDraw = guiHelper.createDrawableItemLike(Items.BRUSH);
+        this.iconDraw = guiHelper.createDrawableItemLike(BPItems.DIAMOND_BRUSH);
         ResourceLocation bg = BrushPlus.id("textures/gui/jei/drop_chance.png");
         this.dropChanceSlotBg = guiHelper.drawableBuilder(bg, 0, 0, 18, 18)
                 .setTextureSize(18, 18)
                 .build();
+        this.iconEggStack = new ItemStack(Items.CREEPER_SPAWN_EGG);
     }
 
     public static List<RecipeHolder<EntityHarvestingRecipe>> getRecipes() {
@@ -87,9 +96,9 @@ public class EntityHarvestingRecipeCategory implements IRecipeCategory<RecipeHol
 
         int ticks = recipe.value().totalTicks();
         if (ticks > 0) {
-            drawLeftString(guiGraphics,
+            drawCenteredString(guiGraphics,
                     Component.translatable("jei.brush_plus.entity_harvesting.time", ticks / 20.0),
-                    SOURCE_X, TIME_Y);
+                    WIDTH / 2, TIME_Y);
         }
     }
 
@@ -104,10 +113,10 @@ public class EntityHarvestingRecipeCategory implements IRecipeCategory<RecipeHol
         guiGraphics.pose().popPose();
     }
 
-    private void drawLeftString(GuiGraphics guiGraphics, Component text, int x, int y) {
+    private void drawCenteredString(GuiGraphics guiGraphics, Component text, int centerX, int y) {
         Font font = Minecraft.getInstance().font;
         FormattedCharSequence sequence = text.getVisualOrderText();
-        guiGraphics.drawString(font, sequence, x, y, 0x555555, false);
+        guiGraphics.drawString(font, sequence, centerX - font.width(sequence) / 2, y, 0x555555, false);
     }
 
     @Override
@@ -117,11 +126,7 @@ public class EntityHarvestingRecipeCategory implements IRecipeCategory<RecipeHol
         EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(recipe.entityId());
         SpawnEggItem egg = SpawnEggItem.byId(entityType);
         ItemStack entityDisplay;
-        if (egg != null) {
-            entityDisplay = egg.getDefaultInstance();
-        } else {
-            entityDisplay = Items.BRUSH.getDefaultInstance();
-        }
+        entityDisplay = Objects.requireNonNullElse(egg, Items.BRUSH).getDefaultInstance();
 
         builder.addSlot(RecipeIngredientRole.INPUT, SOURCE_X, SOURCE_Y)
                 .setStandardSlotBackground()
@@ -178,6 +183,29 @@ public class EntityHarvestingRecipeCategory implements IRecipeCategory<RecipeHol
     @Override
     @Nullable
     public IDrawable getIcon() {
-        return iconDraw;
+        return new IDrawable() {
+            @Override
+            public int getWidth() {
+                return iconDraw.getWidth();
+            }
+
+            @Override
+            public int getHeight() {
+                return iconDraw.getHeight();
+            }
+
+            @Override
+            public void draw(GuiGraphics guiGraphics, int xOffset, int yOffset) {
+                iconDraw.draw(guiGraphics, xOffset, yOffset);
+                int eggSize = 8;
+                int eggX = xOffset + getWidth() - eggSize;
+                int eggY = yOffset + getHeight() - eggSize;
+                guiGraphics.pose().pushPose();
+                guiGraphics.pose().translate(eggX, eggY, 200.0);
+                guiGraphics.pose().scale(0.5f, 0.5f, 1.0f);
+                guiGraphics.renderItem(iconEggStack, 0, 0);
+                guiGraphics.pose().popPose();
+            }
+        };
     }
 }
