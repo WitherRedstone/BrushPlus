@@ -6,6 +6,13 @@
   "item.brush_plus.diamond_brush": "Diamond Brush",
   "item.brush_plus.netherite_brush": "Netherite Brush",
 
+  "enchantment.brush_plus.extra_yield":"Extra Yield",
+  "enchantment.brush_plus.extra_yield.desc":"There is a chance to obtain an extra item when farming items.",
+  "enchantment.brush_plus.golden_touch":"Golden Touch",
+  "enchantment.brush_plus.golden_touch.desc":"Each time you successfully farm, there is a chance to obtain a gold nugget.",
+  "enchantment.brush_plus.quick_brush":"Quick Brush",
+  "enchantment.brush_plus.quick_brush.desc":"Increases brushing speed.",
+
   "jei.brush_plus.block_transmutation.title": "Brush Block Transmutation",
   "jei.brush_plus.block_transmutation.time": "Brush time: %.1f sec",
   "jei.brush_plus.block_transmutation.result_chance": "Conversion chance: %s",

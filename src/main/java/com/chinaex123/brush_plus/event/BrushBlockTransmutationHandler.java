@@ -1,6 +1,7 @@
 package com.chinaex123.brush_plus.event;
 
 import com.chinaex123.brush_plus.crafting.recipe.BlockTransmutationRecipe;
+import com.chinaex123.brush_plus.enchantment.BrushEnchantmentHelper;
 import com.chinaex123.brush_plus.init.BPRecipes;
 import com.chinaex123.brush_plus.network.BrushProgressS2CPacket;
 import net.minecraft.core.BlockPos;
@@ -13,7 +14,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.BrushItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -106,15 +106,18 @@ public class BrushBlockTransmutationHandler {
         BlockTransmutationRecipe recipe = matchedRecipe.get();
         long gameTime = level.getGameTime();
 
+        // 迅捷附魔：算出实际所需 tick 数
+        int effectiveTotalTicks = BrushEnchantmentHelper.calcEffectiveTotalTicks(heldItem, level, recipe.totalTicks());
+
         if (gameTime % 4 == 0) {
             spawnBrushParticles(level, pos, state);
         }
 
         int currentProgress = PROGRESS_MAP.getOrDefault(progressKey, 0) + 1;
 
-        PacketDistributor.sendToPlayer(player, new BrushProgressS2CPacket(pos, currentProgress, recipe.totalTicks()));
+        PacketDistributor.sendToPlayer(player, new BrushProgressS2CPacket(pos, currentProgress, effectiveTotalTicks));
 
-        if (currentProgress >= recipe.totalTicks()) {
+        if (currentProgress >= effectiveTotalTicks) {
             PROGRESS_MAP.remove(progressKey);
             PacketDistributor.sendToPlayer(player, new BrushProgressS2CPacket(pos, 0, 0));
 
@@ -124,29 +127,21 @@ public class BrushBlockTransmutationHandler {
                 level.setBlock(pos, block.defaultBlockState(), Block.UPDATE_ALL);
             }
 
+            // 掉落物：基础概率 + 额外馈赠附魔加成
             for (BlockTransmutationRecipe.DropEntry entry : recipe.validDrops()) {
                 if (level.getRandom().nextFloat() < entry.chance()) {
-                    ItemStack dropStack = entry.item().copy();
-                    ItemEntity itemEntity = new ItemEntity(
-                            level,
-                            pos.getX() + 0.5,
-                            pos.getY() + 1.0,
-                            pos.getZ() + 0.5,
-                            dropStack
-                    );
-                    itemEntity.setDeltaMovement(
-                            (level.getRandom().nextDouble() - 0.5) * 0.15,
-                            0.35,
-                            (level.getRandom().nextDouble() - 0.5) * 0.15
-                    );
-                    itemEntity.setPickUpDelay(10);
-                    level.addFreshEntity(itemEntity);
+                    int count = BrushEnchantmentHelper.rollExtraYield(heldItem, level, 1);
+                    for (int i = 0; i < count; i++) {
+                        BrushEnchantmentHelper.spawnDropItem(level, pos, entry.item().copy());
+                    }
                 }
             }
 
+            // 刷石成金：独立概率掉金粒
+            BrushEnchantmentHelper.rollGoldenTouch(heldItem, level, pos);
+
             InteractionHand hand = player.getUsedItemHand();
-            EquipmentSlot slot = hand == InteractionHand.MAIN_HAND
-                    ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+            EquipmentSlot slot = hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
             heldItem.hurtAndBreak(1, player, slot);
         } else {
             PROGRESS_MAP.put(progressKey, currentProgress);

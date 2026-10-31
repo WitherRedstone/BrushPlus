@@ -2,6 +2,7 @@ package com.chinaex123.brush_plus;
 
 import com.chinaex123.brush_plus.config.BPClientConfig;
 import com.chinaex123.brush_plus.init.BPCreativeTabs;
+import com.chinaex123.brush_plus.init.BPEnchantments;
 import com.chinaex123.brush_plus.init.BPItems;
 import com.chinaex123.brush_plus.init.BPRecipes;
 import com.mojang.logging.LogUtils;
@@ -18,10 +19,10 @@ public class BrushPlus {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public BrushPlus(IEventBus modEventBus, ModContainer modContainer) {
-        BPItems.ITEMS.register(modEventBus);
-        BPCreativeTabs.register(modEventBus);
-        BPRecipes.RECIPE_SERIALIZERS.register(modEventBus);
         modContainer.registerConfig(ModConfig.Type.CLIENT, BPClientConfig.SPEC);
+        BPItems.ITEMS.register(modEventBus);
+        BPRecipes.RECIPE_SERIALIZERS.register(modEventBus);
+        BPCreativeTabs.register(modEventBus);
     }
 
     public static ResourceLocation id(String name) {

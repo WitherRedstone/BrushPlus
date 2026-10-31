@@ -6,6 +6,13 @@
   "item.brush_plus.diamond_brush": "钻石刷子",
   "item.brush_plus.netherite_brush": "下界合金刷子",
 
+  "enchantment.brush_plus.extra_yield":"额外馈赠",
+  "enchantment.brush_plus.extra_yield.desc":"刷取物品时有概率额外获得一个物品",
+  "enchantment.brush_plus.golden_touch":"刷石成金",
+  "enchantment.brush_plus.golden_touch.desc":"每次刷取成功时都有概率获得一个金粒",
+  "enchantment.brush_plus.quick_brush":"快刷手",
+  "enchantment.brush_plus.quick_brush.desc":"提升刷子刷取的速度",
+
   "jei.brush_plus.block_transmutation.title": "刷子方块转化",
   "jei.brush_plus.block_transmutation.time": "刷时长: %.1f 秒",
   "jei.brush_plus.block_transmutation.result_chance": "转化概率: %s",
